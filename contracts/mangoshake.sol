@@ -7,8 +7,8 @@ contract FundingCreator {
     uint fundingindex = 0;
     event FundraiserCreated(uint fundraiserIndex);
 
-    function createFunding(uint inputGoal, uint inputDeadline) public {
-        CrowdFunding newFunding = new CrowdFunding(inputGoal, inputDeadline, msg.sender);
+    function createFunding(uint inputGoal, uint inputDeadline , string calldata DataHash) public {
+        CrowdFunding newFunding = new CrowdFunding(inputGoal, inputDeadline, DataHash , msg.sender);
         fundingindex = fundingindex + 1;
         fundings[fundingindex] = newFunding;
         emit FundraiserCreated(fundingindex);
@@ -35,16 +35,17 @@ contract CrowdFunding {
     uint public deadline;
     uint public goal;
     uint public raisedAmount;
-
+    string public data;
     
     event ContributeEvent(address _sender, uint _value);
     event fundsWithdrawn( uint _value);
 
     
-    constructor(uint _goal, uint _deadline, address eoa)  {
+    constructor(uint _goal, uint _deadline, string memory  _dataHash , address eoa)  {
         goal = _goal * (1 ether);
         deadline = block.timestamp + _deadline;
         admin = payable(eoa);
+        data = _dataHash;
         
         minimumContribution = 100 wei;
     }

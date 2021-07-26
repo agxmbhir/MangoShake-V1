@@ -11,6 +11,7 @@
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.4.1",
     "dotenv": "^10.0.0",
-    "styled-components": "^5.3.0"
+    "styled-components": "^5.3.0",
+    "truffle": "^5.4.2"
   }
 }

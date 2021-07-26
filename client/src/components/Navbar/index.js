@@ -13,7 +13,7 @@ const Nav = (props) => (
              <Button><Link to="/create">Create a fundraiser</Link></Button>
              <Button><span>Documentation</span></Button>
         </Buttons>
-        <User>{props.UserAddress}</User>
+        <User>{props.userAddress}</User>
      </Wrapper>
 )
 
