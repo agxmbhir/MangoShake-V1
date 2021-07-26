@@ -16,7 +16,7 @@ function Home(props)  {
     <div className="body-div">
 
     <div className="header-div">
-      <h2>{props.FundTitle} - { id }</h2>
+      <h2>{props.FundTitle} - { id } No - { props.count}</h2>
     </div>
 
 

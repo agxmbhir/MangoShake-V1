@@ -13,6 +13,8 @@ function Form(props){
   const [uploading, setUploading] = useState(false);
   const [created, setCreated] = useState();
   const [imgHash , setImgHash ] = useState();
+
+  const [ isPending , setIsPending ] = useState() 
   let ipfs
   useEffect(()=>{ // persistent ipfs node.. optional
     ipfs = create(infura);
@@ -33,7 +35,7 @@ function Form(props){
 
   // Get File Function 
   async function getFile(cid){
-  
+    
     let chunks 
 
  
@@ -73,14 +75,24 @@ function Form(props){
   }
 
  async function CreateFundraiser(instance , account) {
+  let goal = document.getElementById('Goal').value;
+
+  setIsPending(true)
+
    const ipfsHash = await submitData() 
-   let goal = document.getElementById('Goal').value;
+  
+   instance.methods.createFunding( goal , 17800, ipfsHash.path ).send({from: account[0]}).then((value) => {
+     alert(JSON.stringify(value))
+    setIsPending(false)
+   }
+   )
 
-  instance.methods.createFunding( goal , 17800, ipfsHash.path ).send({from: account[0]}).then((value) => console.log(value))
  
-
+  
  }
- 
+ if (isPending == true) {
+   return <div>Grab a mango, by the time ethereum does its magic...</div>
+ } 
    return (
      <div className="form">
       <form >
@@ -116,7 +128,7 @@ function Form(props){
         :'open your console'}
     </div>
 
-   )
+   ) 
 }
 
 export default Form;

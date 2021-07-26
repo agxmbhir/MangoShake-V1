@@ -3,7 +3,7 @@ import FundingCreator from  "./contracts/FundingCreator.json";
 import getWeb3 from "./getWeb3";
 
 
-import { useParams , BrowserRouter as Router, Route } from 'react-router-dom'
+import { useParams , BrowserRouter as Router, Route ,Redirect } from 'react-router-dom'
 import './index.css'
 
 // Components
@@ -38,10 +38,12 @@ import Form  from "./Form"
      ); 
       console.error(error);
    }
-     this.state.contract.events.FundraiserCreated({}, function(_, event){
+
+   this.state.contract.events.FundraiserCreated({},(_, event) => {
+     
      // location.replace("/index.html?index=" + event.returnValues.fundraiserIndex);
-      this.setState({ fundraiser : true, fundraiserIndex : event.returnValues.fundraiserIndex})
-  })
+     this.setState({ fundraiser : true, fundIndex : event.returnValues.fundraiserIndex})
+  })     
   };
 
 
@@ -49,13 +51,23 @@ import Form  from "./Form"
     if (!this.state.web3) {
      return <div>Loading Web3, accounts, and contract...</div>;
    }
+   if (this.state.fundraiser == true) {
+     return  (
+       <Router>
+         <Route path='/Index/{:id}' exact >
+     <Home withdrawFunction="" contributeFunction="" FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum"/>
+   </Route>
+      <Redirect to={"/Index/" + this.state.fundIndex} />
+      </Router>
+   )
+   }
    return (
     <>
   <Router>
   <Navbar userAddress = {this.state.accounts} />
-    <Route path='/Index/:id' exact >
-      <Home withdrawFunction="" contributeFunction="" FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum" />
-    </Route>
+  <Route path='/Index/:id' exact >
+     <Home withdrawFunction="" contributeFunction="" FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum" />
+   </Route>
     <Route path='/Create' >
     <Form contract= {this.state.contract} account = {this.state.accounts} />
     </Route>
