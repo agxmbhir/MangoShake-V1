@@ -10,12 +10,12 @@ import Form from "./Form"
 const App = () => (
   <>
   <Router>
-   <Navbar/>
+  <Navbar/>
     <Route path='/' exact component= {Home}/>
     <Route path='/create' component= {Form}/>
 
 
-  </Router> 
+  </Router>
     <GlobalStyle/>
   </>
 )
@@ -83,7 +83,7 @@ const App = () => (
 //       </div>
 //     );
 //   }
-// } 
+// }
 
 */}
 
