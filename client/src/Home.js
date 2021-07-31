@@ -16,12 +16,12 @@ function Home(props)  {
     <div className="body-div">
 
     <div className="header-div">
-      <h2>{props.FundTitle} - { id } No - { props.count}</h2>
+      <h2>{props.FundTitle} - { id } No - {props.count}</h2>
     </div>
 
 
     <div className="main-div">
-      <img className="fundraiser-img" src="img/test.jpg" alt=""></img>
+      <img className="fundraiser-img" src={props.img} alt=""></img>
       <p>{props.FundDescription}</p>
     </div>
 
@@ -33,8 +33,8 @@ function Home(props)  {
         <div className="progress" id="progress">
 
           <div className="identifiers">
-            <span>Raised</span>
-            <span>Goal</span>
+            <span>Raised {props.raised}</span>
+            <span>Goal {props.goal}</span>
           </div>
 
           <div className="duration-wrapper">
@@ -43,7 +43,7 @@ function Home(props)  {
           </div>
           
           <div className="dollar-value-wrapper">
-            <span className="raised-dollars raised-progress"></span>
+            <span className="raised-dollars raised-progress">{props.hash}</span>
             <span className="goal-dollars goal-progress"></span>
           </div>
         </div>
@@ -51,7 +51,7 @@ function Home(props)  {
    
       <input className="input" id="contribute-amount" type="number" placeholder="Contribution Amount"  onkeypress="return event.charCode != 45" required>
           </input>
-      <button id="contribute-button">Contribute</button>
+      <button id="contribute-button" onClick={()=>  props.contributeFunction}>Contribute</button>
     </div>
 
 </div>

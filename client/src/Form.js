@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import './CSS/FormStyles.css'
 import {pinByHash} from './utils/pinataPinner';
@@ -15,9 +15,9 @@ function Form(props){
   const [imgHash , setImgHash ] = useState();
 
   const [ isPending , setIsPending ] = useState() 
-  let ipfs
+ const ipfs = useRef(null)
   useEffect(()=>{ // persistent ipfs node.. optional
-    ipfs = create(infura);
+    ipfs.current = create(infura);
     console.log('IPFS connected: ',ipfs)
   },[])
 
@@ -39,7 +39,7 @@ function Form(props){
     let chunks 
 
  
-        for await (const chunk of ipfs.cat(cid)) {
+        for await (const chunk of ipfs.current.cat(cid)) {
 
             chunks = binArrayToJson(chunk);
         }
@@ -56,11 +56,11 @@ function Form(props){
     let description = document.getElementById('description').value;
     let file = document.getElementById('file').files[0]
 
-    let fileCID = await ipfs.add(file, {pin:true,}); // file
+    let fileCID = await ipfs.current.add(file, {pin:true,}); // file
     pinByHash(fileCID);
 
     let objectStruct = JSON.stringify({title:title, goal:goal, description:description, file:fileCID.path})
-    let dataCID = await ipfs.add(objectStruct, {pin: true,}) // object
+    let dataCID = await ipfs.current.add(objectStruct, {pin: true,}) // object
 
     pinByHash(dataCID);
 
@@ -114,7 +114,7 @@ function Form(props){
         </div>
 
       </form>
-      {ipfs || !uploading?
+      {ipfs.current || !uploading?
         <button onClick={()=> CreateFundraiser(props.contract , props.account)}>Create</button>
         :'loading IPFS or data'}
         <br />

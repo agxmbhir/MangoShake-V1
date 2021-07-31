@@ -1,5 +1,6 @@
-import React , { Component } from "react";
-import FundingCreator from  "./contracts/FundingCreator.json";
+import React , { useEffect, useState } from "react";
+import FundingCreatorContract from  "./contracts/FundingCreator.json";
+import CrowdFundingContract from "./contracts/CrowdFunding.json"
 import getWeb3 from "./getWeb3";
 
 
@@ -11,11 +12,22 @@ import Navbar from './components/Navbar';
 import Home from "./Home";
 import Form  from "./Form"
 
- class App extends Component {
- state = { storageValue: 0, web3: null, accounts: null, contract: null , fundraiser: null , fundIndex: null};
+function App() {
+//  state = {  web3: null, accounts: null, contract: null , fundraiser: null , fundIndex: null};
+ const [ Web3 , setWeb3] = useState()
+ const [ accounts ,setAccounts] = useState(null)
+ const [ ContractInstance , setContractInstance ] = useState()
 
+ const [ fundraiser , setFundraiser] = useState(false) 
+ const [ fundIndex , setfundIndex] = useState(null)
+ const [ networkId , setNetwork ] = useState()
+ const [ CrowdFunding , setCrowdFunding] = useState(null)
 
-  componentDidMount = async () => {
+  const [ fundraiserData , setFundraiserData ] = useState({Hash : null ,  goalAmount: null , raisedAmount : null})
+
+useEffect(() => {
+
+ async function ContractInit() {
     try {
        const web3 = await getWeb3();
 
@@ -24,13 +36,20 @@ import Form  from "./Form"
 
      // Get the contract instance.
        const networkId = await web3.eth.net.getId();
-       const deployedNetwork = FundingCreator.networks[networkId];
+       const deployedNetwork = FundingCreatorContract.networks[networkId];
        const instance = new web3.eth.Contract(
-       FundingCreator.abi,
+       FundingCreatorContract.abi,
        deployedNetwork && deployedNetwork.address,
       );
 
-       this.setState({ web3, accounts, contract: instance }, this.runExample);
+
+
+     setContractInstance(instance)
+     setNetwork(networkId)
+     setWeb3(web3)
+     setAccounts(accounts)
+   
+    
    } catch (error) {
    // Catch any errors for any of the above operations.
      alert(
@@ -39,42 +58,88 @@ import Form  from "./Form"
       console.error(error);
    }
 
-   this.state.contract.events.FundraiserCreated({},(_, event) => {
-     
-     // location.replace("/index.html?index=" + event.returnValues.fundraiserIndex);
-     this.setState({ fundraiser : true, fundIndex : event.returnValues.fundraiserIndex})
-  })     
-  };
+}
+ContractInit()
+
+}, [ContractInstance , accounts , Web3] )
 
 
-  render() {
-    if (!this.state.web3) {
+// Getting the fundraiser Data 
+async function getFundraiserData() {
+const Hash = await CrowdFunding.methods.data.call()
+const Goal = await CrowdFunding.methods.goal.call()
+const Raised = await CrowdFunding.methods.raisedAmount.call()
+setFundraiserData( {Hash : Hash , goalAmount : Goal , raisedAmount : Raised})
+}
+
+//Triggering the getting fundraiser function 
+if (CrowdFunding) {
+  getFundraiserData()
+}
+
+
+
+async function getFundraiserContract() {
+  //Waits for Web3 to be updated 
+if (Web3) {
+  (async () => {
+    const deployedNetwork = FundingCreatorContract.networks[networkId];
+    const instance = new Web3.eth.Contract(
+      FundingCreatorContract.abi,
+      deployedNetwork && deployedNetwork.address
+    );
+    })
+    (async () => {
+      const address = await FundingCreatorContract.methods.getFundingContractAddress({fundIndex}).call();
+      const fundraiserInstance = new Web3.eth.Contract(
+        CrowdFundingContract.abi,
+        address
+      );   
+      setCrowdFunding(fundraiserInstance); 
+      })
+
+    }
+
+  }
+
+
+// Setting the event listener for ContractInstance
+//Waits for setState to set Contract Instance
+if (ContractInstance) {
+
+ContractInstance.events.FundraiserCreated({},(_, event) => {
+
+  setFundraiser(true)
+  setfundIndex(event.returnValues.fundraiserIndex)
+
+ getFundraiserContract()
+}) 
+}
+   if (!Web3) {
      return <div>Loading Web3, accounts, and contract...</div>;
    }
-   if (this.state.fundraiser == true) {
+   if (fundraiser == true) {
+    
      return  (
        <Router>
          <Route path='/Index/{:id}' exact >
-     <Home withdrawFunction="" contributeFunction="" FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum"/>
+<Home withdrawFunction="" hash = {fundraiserData.Hash} raised={fundraiserData.raisedAmount} goalAmount={fundraiserData.goalAmount}  FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum"/>
    </Route>
-      <Redirect to={"/Index/" + this.state.fundIndex} />
+      <Redirect to={"/Index/" + fundIndex} />
       </Router>
    )
    }
    return (
     <>
   <Router>
-  <Navbar userAddress = {this.state.accounts} />
-  <Route path='/Index/:id' exact >
-     <Home withdrawFunction="" contributeFunction="" FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum" />
-   </Route>
+  <Navbar userAddress = {accounts} />
     <Route path='/Create' >
-    <Form contract= {this.state.contract} account = {this.state.accounts} />
+    <Form contract= {ContractInstance} account = {accounts} />
     </Route>
   </Router>
 
   </>
    )
-} }
+} 
 
 export default App;
