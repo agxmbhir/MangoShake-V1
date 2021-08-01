@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
 import './CSS/HomeStyles.css'
 import CrowdFundingContract from "./contracts/CrowdFunding.json"
-
+import { getFile } from './utils/Ipfs';
 // Components
 
 // import Content from './components/Content';
@@ -10,68 +10,94 @@ import CrowdFundingContract from "./contracts/CrowdFunding.json"
 
 function Home(props)  {
 
- const [ fundHash , setFundHash ] = useState()
+
+  // Loaders
+  const [ donating , setDonating] = useState()
+
+  // Data to be set By contract 
  const [ fundAmount , setFundAmount ] = useState()
  const [ fundGoal , setFundGoal ] = useState()
  const [ address , setAddress ] = useState()
+ const [ fundHash , setFundHash] = useState()
+// Data to be set by IPFS 
+const [ fundTitle , setFundTitle ] = useState()
+const [ fundDescription , setFundDescription ] = useState()
+const [ fundImg , setFundImg ] = useState()
+
  const [ CrowdFunding , setCrowdFunding ] = useState()
 
- const [ donating , setDonating] = useState(false)
 
  const { id } = useParams();
 
-async function getFundAddress(Instance, Index , Web3) {
+// Initialises the contract 
+async function getFundAddress(Instance, Web3) {
 
   let address
   const contract = await Instance.methods.getFundingContractAddress(id).call().then((value) => {
    address = value
   })
-
   const fundraiserInstance = new Web3.eth.Contract(
     CrowdFundingContract.abi,
     address
   );  
-
+  // Gets some Data
   const Hash = await fundraiserInstance.methods.data().call()
   const raisedAmount = await fundraiserInstance.methods.raisedAmount().call()
   const Goal = await  fundraiserInstance.methods.goal().call()
 
+  //Sets some states
   setFundAmount(raisedAmount)
   setFundGoal(Goal)
-  setFundHash(Hash)
   setAddress(address)
-  setCrowdFunding(fundraiserInstance); 
-
+  setCrowdFunding(fundraiserInstance);
+  setFundHash(Hash)
+  // const Data = await getFile(Hash)
+  // setFundTitle(Data.title)
+  // setFundDescription(Data.description)
+  // setFundImg(Data.file)
 }
+useEffect(()=> {
+  async function setData() {
+  const Data = await getFile(props.fundHash)
+  setFundTitle(Data.title)
+  setFundDescription(Data.description)
+  setFundImg(Data.file)
+  }
+  setData()
+} , [])
+
+// Contribute Function (DUH)
 async function contribute(account , Web3) {
   setDonating(true)
   let reciept
   const amount = document.getElementById("contribute-amount").value
- console.log(amount)
-  await CrowdFunding.methods.contribute().send({from : account , value: Web3.utils.toWei(amount)}).then(() => {
-  setDonating(false)
-
+  console.log(amount)
+  await CrowdFunding.methods.contribute().send({from : account[0] , value: Web3.utils.toWei(amount).toString()}).then((r) => {
+    reciept = r 
+    setDonating(false)
   })
 
   alert("You are a good man " + account + +"Here's yout reciept"+ reciept )
 }
 
-getFundAddress(props.creatorContract , props.Index , props.web3)
+
+getFundAddress(props.creatorContract , props.web3)
+
 if (donating == true) {
-  return <div>Good things take time Senyorita</div>
+  return <div>Good things take time...</div>
 }
  return (
 
     <div className="body-div"  >
     <button>Get data</button>
     <div className="header-div">
-      <h2>{fundHash} - { id } No - {fundAmount}</h2>
+      <h2>{fundTitle}</h2>
     </div>
 
 
     <div className="main-div">
-      <img className="fundraiser-img" src={props.img} alt=""></img>
-      <p>{props.FundDescription}</p>
+      <img className="fundraiser-img" src= {`https://ipfs.io/ipfs/${fundImg}`} alt=""></img>
+      <p>{fundDescription}</p>
     </div>
 
     <div className="fundraiser-details">       
@@ -98,7 +124,7 @@ if (donating == true) {
         </div>
       </div>
    
-      <input className="input" id="contribute-amount" type="number" placeholder="Contribution Amount"  onkeypress="return event.charCode != 45" required>
+      <input className="input" id="contribute-amount" type="number" placeholder="Contribution Amount"  required>
           </input>
       <button id="contribute-button" onClick={()=>  contribute(props.account , props.web3)}>Contribute</button>
     </div>

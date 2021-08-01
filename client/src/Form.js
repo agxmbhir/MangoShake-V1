@@ -14,40 +14,16 @@ function Form(props){
   const [created, setCreated] = useState();
   const [imgHash , setImgHash ] = useState();
 
-  const [ isPending , setIsPending ] = useState() 
+ const [ isPending , setIsPending ] = useState() 
  const ipfs = useRef(null)
+ 
   useEffect(()=>{ // persistent ipfs node.. optional
     ipfs.current = create(infura);
     console.log('IPFS connected: ',ipfs)
   },[])
 
-// Convert Binary Into JSON 
-  var binArrayToJson = function(binArray)
-  {
-      var str = "";
-      for (var i = 0; i < binArray.length; i++) {
-          str += String.fromCharCode(parseInt(binArray[i]));
-      }
-      return JSON.parse(str)
-  }
 
-
-
-// Get File Function 
-  async function getFile(cid){
-    
-    let chunks 
-
- 
-        for await (const chunk of ipfs.current.cat(cid)) {
-
-            chunks = binArrayToJson(chunk);
-        }
-
-        return chunks;
-    }
-    
-  
+  // Submitting the Data to IPFS 
   async function submitData(){
 
     setUploading(true);
@@ -69,13 +45,10 @@ function Form(props){
     setUploading(false);
 
     setCreated(dataCID.path);
-  const finalData =  await getFile(dataCID.path)
-    setImgHash(finalData.file)
-
     return dataCID;
   }
 
-// Creates a fundraiser 
+// Creates a Fundraiser 
  async function CreateFundraiser(instance , account) {
 
   let goal = document.getElementById('Goal').value;
@@ -83,12 +56,14 @@ function Form(props){
   setIsPending(true)
    const ipfsHash = await submitData() 
    instance.methods.createFunding( goal , 17800, ipfsHash.path ).send({from: account[0]}).then((value) => {
-     alert(JSON.stringify(value))
     setIsPending(false)
    }
    )
+  props.setHash(ipfsHash.path)
  }
  
+
+
  if (isPending == true) {
    return <div>Grab a mango, by the time ethereum does its magic...</div>
  } 
@@ -114,7 +89,7 @@ function Form(props){
 
       </form>
       {ipfs.current || !uploading?
-        <button onClick={()=> CreateFundraiser(props.contract , props.account)}>Create</button>
+        <button onClick={()=> CreateFundraiser(props.contract , props.account )}>Create</button>
         :'loading IPFS or data'}
         <br />
       {created?

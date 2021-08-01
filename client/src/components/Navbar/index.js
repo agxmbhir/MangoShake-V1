@@ -14,6 +14,7 @@ const Nav = (props) => (
              <Button><span>Documentation</span></Button>
         </Buttons>
         <User>{props.userAddress}</User>
+        <User>{props.IPFSHash}</User>
      </Wrapper>
 )
 
