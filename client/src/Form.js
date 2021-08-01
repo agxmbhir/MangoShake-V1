@@ -33,7 +33,7 @@ function Form(props){
 
 
 
-  // Get File Function 
+// Get File Function 
   async function getFile(cid){
     
     let chunks 
@@ -47,6 +47,7 @@ function Form(props){
         return chunks;
     }
     
+  
   async function submitData(){
 
     setUploading(true);
@@ -74,22 +75,20 @@ function Form(props){
     return dataCID;
   }
 
+// Creates a fundraiser 
  async function CreateFundraiser(instance , account) {
+
   let goal = document.getElementById('Goal').value;
 
   setIsPending(true)
-
    const ipfsHash = await submitData() 
-  
    instance.methods.createFunding( goal , 17800, ipfsHash.path ).send({from: account[0]}).then((value) => {
      alert(JSON.stringify(value))
     setIsPending(false)
    }
    )
-
- 
-  
  }
+ 
  if (isPending == true) {
    return <div>Grab a mango, by the time ethereum does its magic...</div>
  } 

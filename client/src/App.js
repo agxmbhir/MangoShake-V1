@@ -1,4 +1,4 @@
-import React , { useEffect, useState } from "react";
+import React , { useEffect, useState  } from "react";
 import FundingCreatorContract from  "./contracts/FundingCreator.json";
 import CrowdFundingContract from "./contracts/CrowdFunding.json"
 import getWeb3 from "./getWeb3";
@@ -43,7 +43,6 @@ useEffect(() => {
       );
 
 
-
      setContractInstance(instance)
      setNetwork(networkId)
      setWeb3(web3)
@@ -63,19 +62,6 @@ ContractInit()
 
 }, [ContractInstance , accounts , Web3] )
 
-
-// Getting the fundraiser Data 
-async function getFundraiserData() {
-const Hash = await CrowdFunding.methods.data.call()
-const Goal = await CrowdFunding.methods.goal.call()
-const Raised = await CrowdFunding.methods.raisedAmount.call()
-setFundraiserData( {Hash : Hash , goalAmount : Goal , raisedAmount : Raised})
-}
-
-//Triggering the getting fundraiser function 
-if (CrowdFunding) {
-  getFundraiserData()
-}
 
 
 
@@ -99,7 +85,6 @@ if (Web3) {
       })
 
     }
-
   }
 
 
@@ -117,14 +102,12 @@ ContractInstance.events.FundraiserCreated({},(_, event) => {
 }
    if (!Web3) {
      return <div>Loading Web3, accounts, and contract...</div>;
+     
    }
    if (fundraiser == true) {
     
      return  (
        <Router>
-         <Route path='/Index/{:id}' exact >
-<Home withdrawFunction="" hash = {fundraiserData.Hash} raised={fundraiserData.raisedAmount} goalAmount={fundraiserData.goalAmount}  FundTitle = "Please Help Himalyas" FundDescription ="Lorem Ipsum"/>
-   </Route>
       <Redirect to={"/Index/" + fundIndex} />
       </Router>
    )
@@ -133,6 +116,14 @@ ContractInstance.events.FundraiserCreated({},(_, event) => {
     <>
   <Router>
   <Navbar userAddress = {accounts} />
+    <Route path='/Index/:id' exact >
+         <Home 
+         withdrawFunction="" 
+         creatorContract = { ContractInstance }
+         Index = {fundIndex}
+         web3 = { Web3 }
+         />
+   </Route>
     <Route path='/Create' >
     <Form contract= {ContractInstance} account = {accounts} />
     </Route>
