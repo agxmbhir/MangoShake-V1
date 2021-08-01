@@ -118,7 +118,7 @@ ContractInstance.events.FundraiserCreated({},(_, event) => {
   <Navbar userAddress = {accounts} />
     <Route path='/Index/:id' exact >
          <Home 
-         withdrawFunction="" 
+         account = {accounts}
          creatorContract = { ContractInstance }
          Index = {fundIndex}
          web3 = { Web3 }

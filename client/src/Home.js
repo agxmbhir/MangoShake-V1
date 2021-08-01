@@ -43,14 +43,23 @@ async function getFundAddress(Instance, Index , Web3) {
   setCrowdFunding(fundraiserInstance); 
 
 }
-async function contribute() {
+async function contribute(account , Web3) {
   setDonating(true)
-  const amount = document.getElementById("contribute-amount")
-  await 
+  let reciept
+  const amount = document.getElementById("contribute-amount").value
+ console.log(amount)
+  await CrowdFunding.methods.contribute().send({from : account , value: Web3.utils.toWei(amount)}).then(() => {
+  setDonating(false)
+
+  })
+
+  alert("You are a good man " + account + +"Here's yout reciept"+ reciept )
 }
 
 getFundAddress(props.creatorContract , props.Index , props.web3)
-
+if (donating == true) {
+  return <div>Good things take time Senyorita</div>
+}
  return (
 
     <div className="body-div"  >
@@ -91,7 +100,7 @@ getFundAddress(props.creatorContract , props.Index , props.web3)
    
       <input className="input" id="contribute-amount" type="number" placeholder="Contribution Amount"  onkeypress="return event.charCode != 45" required>
           </input>
-      <button id="contribute-button" onClick={()=>  props.contributeFunction}>Contribute</button>
+      <button id="contribute-button" onClick={()=>  contribute(props.account , props.web3)}>Contribute</button>
     </div>
 
 </div>
