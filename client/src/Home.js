@@ -18,7 +18,6 @@ function Home(props)  {
  const [ fundAmount , setFundAmount ] = useState()
  const [ fundGoal , setFundGoal ] = useState()
  const [ address , setAddress ] = useState()
- const [ fundHash , setFundHash] = useState()
 // Data to be set by IPFS 
 const [ fundTitle , setFundTitle ] = useState()
 const [ fundDescription , setFundDescription ] = useState()
@@ -29,17 +28,22 @@ const [ fundImg , setFundImg ] = useState()
 
  const { id } = useParams();
 
-// Initialises the contract 
-async function getFundAddress(Instance, Web3) {
+// // Initialises the contract 
+// async function getFundAddress(Instance, Web3) {
 
-  let address
-  const contract = await Instance.methods.getFundingContractAddress(id).call().then((value) => {
-   address = value
-  })
-  const fundraiserInstance = new Web3.eth.Contract(
+ 
+// }
+
+useEffect(() => {
+  async function getFundAddress() {
+
+   const address = await props.creatorContract.methods.getFundingContractAddress(id).call()
+
+  const fundraiserInstance = new props.web3.eth.Contract(
     CrowdFundingContract.abi,
     address
   );  
+
   // Gets some Data
   const Hash = await fundraiserInstance.methods.data().call()
   const raisedAmount = await fundraiserInstance.methods.raisedAmount().call()
@@ -50,21 +54,17 @@ async function getFundAddress(Instance, Web3) {
   setFundGoal(Goal)
   setAddress(address)
   setCrowdFunding(fundraiserInstance);
-  setFundHash(Hash)
-  // const Data = await getFile(Hash)
-  // setFundTitle(Data.title)
-  // setFundDescription(Data.description)
-  // setFundImg(Data.file)
-}
-useEffect(()=> {
-  async function setData() {
-  const Data = await getFile(props.fundHash)
+
+  // Gets some more Data and sets some more states :D 
+  const Data = await getFile(Hash)
   setFundTitle(Data.title)
   setFundDescription(Data.description)
   setFundImg(Data.file)
+
   }
-  setData()
+getFundAddress()
 } , [])
+
 
 // Contribute Function (DUH)
 async function contribute(account , Web3) {
@@ -81,9 +81,9 @@ async function contribute(account , Web3) {
 }
 
 
-getFundAddress(props.creatorContract , props.web3)
 
-if (donating == true) {
+
+if (donating === true) {
   return <div>Good things take time...</div>
 }
  return (

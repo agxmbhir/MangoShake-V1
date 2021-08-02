@@ -12,7 +12,7 @@ function Form(props){
   const infura = { host: "ipfs.infura.io", port: "5001", protocol: "https" };
   const [uploading, setUploading] = useState(false);
   const [created, setCreated] = useState();
-  const [imgHash , setImgHash ] = useState();
+
 
  const [ isPending , setIsPending ] = useState() 
  const ipfs = useRef(null)
@@ -20,7 +20,7 @@ function Form(props){
   useEffect(()=>{ // persistent ipfs node.. optional
     ipfs.current = create(infura);
     console.log('IPFS connected: ',ipfs)
-  },[])
+  },[infura])
 
 
   // Submitting the Data to IPFS 
@@ -59,12 +59,11 @@ function Form(props){
     setIsPending(false)
    }
    )
-  props.setHash(ipfsHash.path)
  }
  
 
 
- if (isPending == true) {
+ if (isPending === true) {
    return <div>Grab a mango, by the time ethereum does its magic...</div>
  } 
    return (

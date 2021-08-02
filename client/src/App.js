@@ -19,8 +19,8 @@ function App() {
 
  const [ fundraiser , setFundraiser] = useState(false) 
  const [ fundIndex , setfundIndex] = useState(null)
- const [ networkId , setNetwork ] = useState()
- const [ IPFSHash , setIPFSHash] = useState()
+
+
 
 useEffect(() => {
 
@@ -41,7 +41,6 @@ useEffect(() => {
 
 
      setContractInstance(instance)
-     setNetwork(networkId)
      setWeb3(web3)
      setAccounts(accounts)
    
@@ -74,7 +73,7 @@ if (ContractInstance) {
      return <div>Loading Web3, accounts, and contract...</div>;
    }
 
-   if (fundraiser == true) {
+   if (fundraiser === true) {
      return  (
        <Router>
       <Redirect to={"/Index/" + fundIndex} />
@@ -91,14 +90,12 @@ if (ContractInstance) {
          creatorContract = { ContractInstance }
          Index = {fundIndex}
          web3 = { Web3 }
-         fundHash = { IPFSHash }
          />
    </Route>
     <Route path='/Create' >
     <Form 
     contract= {ContractInstance} 
     account = {accounts} 
-    setHash = { h => setIPFSHash(h)}
 
     />
     </Route>
