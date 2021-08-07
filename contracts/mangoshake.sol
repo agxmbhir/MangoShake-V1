@@ -4,7 +4,7 @@ pragma solidity >=0.6.0 <0.9.0;
 
 contract FundingCreator {
     mapping(uint => CrowdFunding) public fundings;
-    uint fundingindex = 0;
+    uint public fundingindex = 0;
     event FundraiserCreated(uint fundraiserIndex);
 
     function createFunding(uint inputGoal, uint inputDeadline , string calldata DataHash) public {
@@ -18,7 +18,6 @@ contract FundingCreator {
         CrowdFunding funding = fundings[_fundingindex];
         return funding.goal();
     }
-
      function getFundingContractAddress(uint _fundingindex) public view returns (address) {
         CrowdFunding funding = fundings[_fundingindex];
         return address(funding);

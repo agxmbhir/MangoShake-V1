@@ -10,7 +10,7 @@ import './index.css'
 import Navbar from './components/Navbar';
 import Home from "./Home";
 import Form  from "./Form"
-
+import Browse from "./Browse"
 function App() {
   
  const [ Web3 , setWeb3] = useState()
@@ -101,7 +101,11 @@ if (ContractInstance) {
     </Route>
 
     <Route path='/Browse' >
-      contract= {ContractInstance}
+      <Browse
+        contract= {ContractInstance}
+       fundIndex = {fundIndex}
+       web3 = { Web3 }
+        />
     </Route>
   </Router>
 
