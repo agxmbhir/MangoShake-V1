@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import './CSS/HomeStyles.css'
 import CrowdFundingContract from "./contracts/CrowdFunding.json"
+
+//utils 
 import { getFile } from './utils/Ipfs';
+import { toUSD , toETH } from './utils/ethStats'
+
 // Components
 
 // import Content from './components/Content';
@@ -18,21 +22,23 @@ function Home(props)  {
  const [ fundAmount , setFundAmount ] = useState()
  const [ fundGoal , setFundGoal ] = useState()
  const [ address , setAddress ] = useState()
+
+//Amounts in USD
+const [ raisedUSD , setRaisedUSD ] = useState()
+const [ goalUSD , setGoalUSD ] = useState()
 // Data to be set by IPFS 
 const [ fundTitle , setFundTitle ] = useState()
 const [ fundDescription , setFundDescription ] = useState()
 const [ fundImg , setFundImg ] = useState()
+//Contract 
+const [ CrowdFunding , setCrowdFunding ] = useState()
 
- const [ CrowdFunding , setCrowdFunding ] = useState()
-
+// Setting some stats 
+const [ stats , setStats] = useState( { raised : null , goal : null })
 
  const { id } = useParams();
 
-// // Initialises the contract 
-// async function getFundAddress(Instance, Web3) {
-
  
-// }
 
 useEffect(() => {
   async function getFundAddress() {
@@ -50,10 +56,14 @@ useEffect(() => {
   const Goal = await  fundraiserInstance.methods.goal().call()
 
   //Sets some states
-  setFundAmount(raisedAmount)
-  setFundGoal(Goal)
+  setFundAmount(props.web3.utils.fromWei(raisedAmount))
+  setFundGoal(props.web3.utils.fromWei(Goal))
   setAddress(address)
   setCrowdFunding(fundraiserInstance);
+
+  //
+ setRaisedUSD( await toUSD(props.web3.utils.fromWei(raisedAmount)))
+ setGoalUSD( await toUSD(props.web3.utils.fromWei(Goal)))
 
   // Gets some more Data and sets some more states :D 
   const Data = await getFile(Hash)
@@ -64,6 +74,9 @@ useEffect(() => {
   }
 getFundAddress()
 } , [])
+
+
+// getting and setting some stats 
 
 
 // Contribute Function (DUH)
@@ -87,49 +100,33 @@ if (donating === true) {
   return <div>Good things take time...</div>
 }
  return (
+<>
+    <div className="body">
 
-    <div className="body-div"  >
-    <button>Get data</button>
-    <div className="header-div">
-      <h2>{fundTitle}</h2>
-    </div>
+   <h2 className="title">{fundTitle}</h2>
 
+    <div className="fundraiser">
 
-    <div className="main-div">
+      <div className = "fundraiser-right">
       <img className="fundraiser-img" src= {`https://ipfs.io/ipfs/${fundImg}`} alt=""></img>
       <p>{fundDescription}</p>
-    </div>
-
-    <div className="fundraiser-details">       
-    
-    <button id="withdraw-button" className="hidden">Withdraw Funds</button>
-      
-      <div className="progress-container" id="progress-container">
-        <div className="progress" id="progress">
-
-          <div className="identifiers">
-            <span>Raised {fundAmount}</span>
-            <span>Goal {fundGoal}</span>
-          </div>
-
-          <div className="duration-wrapper">
-            <span className="raised raised-progress"></span>
-            <span className="goal goal-progress"></span>
-          </div>
-          
-          <div className="dollar-value-wrapper">
-            <span className="raised-dollars raised-progress">{address}</span>
-            <span className="goal-dollars goal-progress"></span>
-          </div>
-        </div>
       </div>
-   
-      <input className="input" id="contribute-amount" type="number" placeholder="Contribution Amount"  required>
-          </input>
-      <button id="contribute-button" onClick={()=>  contribute(props.account , props.web3)}>Contribute</button>
-    </div>
 
+      <div className = "fundraiser-left">
+      <button className="withdraw-button" >Withdraw Funds</button>
+      
+      <div className="amounts">
+        <span>Raised {fundAmount} || {raisedUSD} </span>
+        <span>Goal {fundGoal} || {goalUSD}</span>
+      </div>
+  
+     <input className="contribute-amount" id="contribute-amount" type="number" placeholder="Amount"  required></input>
+     <button id="contribute-button" onClick={()=>  contribute(props.account , props.web3)}>Contribute</button>
+      </div>
+
+    </div>
 </div>
+</>
 
 
 )}

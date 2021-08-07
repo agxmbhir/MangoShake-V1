@@ -4,7 +4,6 @@ export const Wrapper = styled.div`
   display: flex;
   position:sticky;
   height: 50px;
-  box-shadow: -70px 11px 19px 0px rgb(0 0 0 30% );
   cursor: default;
   padding: 10px;
 `;

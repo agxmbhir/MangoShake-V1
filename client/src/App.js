@@ -99,6 +99,10 @@ if (ContractInstance) {
 
     />
     </Route>
+
+    <Route path='/Browse' >
+      contract= {ContractInstance}
+    </Route>
   </Router>
 
   </>
