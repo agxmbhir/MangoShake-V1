@@ -1,0 +1,25 @@
+.fundraiser-div {
+   padding: 50px;
+}
+
+
+
+.fund-item{
+    width: 27%;
+    height: 400px;
+    text-align: center;
+    display: inline-block;
+    margin: 40px 20px ;
+    border-radius: 10px;
+    border-color: rgb(114, 112, 112);
+    border-style: solid;
+    border-width: 0.2px;
+   padding: 10px;
+}
+.fund-item img{
+    width : 80%;
+    height: 200px;
+}
+.fund-item h1 {
+    font-size: 20px;
+}

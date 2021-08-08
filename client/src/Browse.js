@@ -2,6 +2,8 @@ import React , {useEffect , useState} from "react"
 import CrowdFundingContract from "./contracts/CrowdFunding.json"
 import { getFile } from "./utils/Ipfs"
 import './CSS/Browse.css'
+import ProgressBar from './components/ProgressBar'
+import { Link } from 'react-router-dom'
 function Browse(props) {
 
 
@@ -27,21 +29,24 @@ useEffect(() => {
       address
     ); 
     
+    // Gets data from Contract 
     let ImageHash 
     let Description 
     let Title 
     const raisedAmount = await fundraiserInstance.methods.raisedAmount().call()
     const Goal = await  fundraiserInstance.methods.goal().call()
-    const DataHash = await fundraiserInstance.methods.data().call().then(async (h) => {
 
+    // Gets Hash From Contract and gets file from Hash // IPFS to the moon
+    const DataHash = await fundraiserInstance.methods.data().call().then(async (h) => {
       const Data = await getFile(h)
       Title = Data.title
-      Description = Data.description
+      Description = Data.description.slice(0,10)
       ImageHash = Data.file 
     })
   
     setFundraiserData(prevFundraiserData => {
       const newFundraiserData = [...prevFundraiserData, {
+              Id : prevFundraiserData.length++,
               title: Title,
               description: Description,
               imageHash: ImageHash,
@@ -51,23 +56,22 @@ useEffect(() => {
       return newFundraiserData
     })
 
-    console.log(fundraiserData)
  }
 
  }
-
  browseInit()
 }, [])
 
     return (    
-<div>
+<div className="fundraiser-div">
   { fundraiserData.map((data) =>
-  <div className="fund-item">
-  <h1>{data.title}</h1>
-  <img src= {`https://ipfs.io/ipfs/${data.imageHash}`}></img>
-  <p>{data.title}</p>
-  <p>{data.goal}</p>
-  <p>{data.title}</p>
+  <div key= {data.Id} className="fund-item">
+    <h1>{data.title}</h1>
+      <img src= {`https://ipfs.io/ipfs/${data.imageHash}`}></img>
+      <p>{data.description}</p>
+      <p>{props.web3.utils.fromWei(data.raised)}||{props.web3.utils.fromWei(data.goal)}</p>
+      <ProgressBar completed={(data.raised / data.goal) * 100} bgColor={"black"}></ProgressBar>
+      <button><Link to= {`/Index/${data.Id + 1}`}>Donate</Link></button>
   </div>
    )}
 </div>
