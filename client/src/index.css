@@ -1,31 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
-
-:root {
-  --primary-color:white;
-  --secondary-color: whiteSmoke;
-  --hover-theme: ;
-  --font:  'Montserrat', sans-serif;
-}
-
-body {
-  margin: 0;
-  background-color: whitesmoke;
-  grid-template-areas:
-   'header header header header header header'
-   'main main main main right right'
-   'text text text text text text';
-   grid-gap: 10px;
-}
-
-
-
-
-* {
-  font-family: var(--font);
-  
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
+/* ./your-css-folder/styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
